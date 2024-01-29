@@ -3,7 +3,6 @@ services:
   onlyoffice-documentserver:
     build:
       context: .
-    container_name: onlyoffice-documentserver
     depends_on:
       - onlyoffice-postgresql
       - onlyoffice-rabbitmq
@@ -14,17 +13,10 @@ services:
       - DB_NAME=onlyoffice
       - DB_USER=onlyoffice
       - AMQP_URI=amqp://guest:guest@onlyoffice-rabbitmq
-      # Uncomment strings below to enable the JSON Web Token validation.
-      #- JWT_ENABLED=true
-      #- JWT_SECRET=secret
-      #- JWT_HEADER=Authorization
-      #- JWT_IN_BODY=true
     ports:
       - '89:80'
       - '8553:443'
     stdin_open: true
-    restart: always
-    stop_grace_period: 60s
     volumes:
       - onlyoffice_data:/var/www/onlyoffice/Data
       - onlyoffice_logs:/var/log/onlyoffice
@@ -33,22 +25,16 @@ services:
       - onlyoffice_fonts:/usr/share/fonts
 
   onlyoffice-rabbitmq:
-    container_name: onlyoffice-rabbitmq
     image: rabbitmq
-    restart: always
-    expose:
-      - '5672'
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
 
   onlyoffice-postgresql:
-    container_name: onlyoffice-postgresql
     image: postgres:9.5
     environment:
       - POSTGRES_DB=onlyoffice
       - POSTGRES_USER=onlyoffice
       - POSTGRES_HOST_AUTH_METHOD=trust
-    restart: always
-    expose:
-      - '5432'
     volumes:
       - postgresql_data:/var/lib/postgresql
 
@@ -59,3 +45,4 @@ volumes:
   onlyoffice_example_files:
   onlyoffice_fonts:
   postgresql_data:
+  rabbitmq_data:
